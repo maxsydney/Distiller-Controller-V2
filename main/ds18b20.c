@@ -59,8 +59,8 @@ void ds18b20_init(int GPIO)
   init=1;
   printf("Beginning search routine\n");
   doSearch();
-  ds18b20_set_resolution(Ds18B20_Addresses[0], 9);
-  ds18b20_set_resolution(Ds18B20_Addresses[1], 9);
+  ds18b20_set_resolution(Ds18B20_Addresses[0], 10);
+  ds18b20_set_resolution(Ds18B20_Addresses[1], 10);
 }
 
 /// Sends one bit to bus
