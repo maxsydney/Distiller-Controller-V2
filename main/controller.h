@@ -104,4 +104,14 @@ void setFanState(int state);
 
 void setFlush(bool state);
 
+/*
+*   --------------------------------------------------------------------  
+*   checkFan
+*   --------------------------------------------------------------------
+*   Enables automatic handling of radiator fan. Fan will automatically switch
+*   on when the hot side temperature is above a threshold, and switched off
+*   when the system has cooled below the threshold 
+*/
+void checkFan(double T1);
+
 
