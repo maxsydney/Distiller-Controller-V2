@@ -35,6 +35,6 @@ void app_main()
     xTaskCreate(&control_loop, "Controller", 2048, NULL, 6, NULL);
     xTaskCreate(&sendDataUART, "UART send", 2048, NULL, 6, NULL);
     xTaskCreate(&recvDataUART, "UART receive", 2048, NULL, 6, NULL);
-    xTaskCreate(&flowmeter_task, "Flow meter", 2048, NULL, 3, NULL);
+    // xTaskCreate(&flowmeter_task, "Flow meter", 2048, NULL, 3, NULL);
 }
 

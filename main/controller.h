@@ -8,6 +8,7 @@
 #define SENSOR_SAMPLE_PERIOD 1.0f / SENSOR_SAMPLE_RATE
 
 xQueueHandle dataQueue;
+uint16_t ctrl_loop_period_ms;;
 
 typedef struct { 
     float setpoint;

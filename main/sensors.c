@@ -9,6 +9,7 @@
 #include "driver/timer.h"
 #include "ds18b20.h" 
 #include "sensors.h"
+#include "controller.h"
 #include "main.h"
 
 const char* tag = "Sensors";
@@ -26,9 +27,9 @@ esp_err_t sensor_init(uint8_t ds_pin)
     ds18b20_init(ds_pin);
     // set_resolution_10_bit();
     filterTemp = false;
-    hotSideTempQueue = xQueueCreate(2, sizeof(float));
-    coldSideTempQueue = xQueueCreate(2, sizeof(float));
-    flowRateQueue = xQueueCreate(2, sizeof(float));
+    hotSideTempQueue = xQueueCreate(10, sizeof(float));
+    coldSideTempQueue = xQueueCreate(10, sizeof(float));
+    flowRateQueue = xQueueCreate(10, sizeof(float));
     return ESP_OK;
 }
 
@@ -51,6 +52,7 @@ void temp_sensor_task(void *pvParameters)
     float hotTemp = ds18b20_get_temp(hotSideSensor);
     float coldTemp = ds18b20_get_temp(coldSideSensor);
     float newHotTemp, newColdTemp;
+    portTickType xLastWakeTime = xTaskGetTickCount();
     BaseType_t ret;
     while (1) 
     {
@@ -73,15 +75,17 @@ void temp_sensor_task(void *pvParameters)
             }
         }
 
-        ret = xQueueSend(hotSideTempQueue, &hotTemp, 100);
+        ret = xQueueSend(hotSideTempQueue, &hotTemp, 100 / portTICK_PERIOD_MS);
         if (ret == errQUEUE_FULL) {
             ESP_LOGI(tag, "Hot side temp queue full");
         }
 
-        ret = xQueueSend(coldSideTempQueue, &coldTemp, 100);
+        ret = xQueueSend(coldSideTempQueue, &coldTemp, 100 / portTICK_PERIOD_MS);
         if (ret == errQUEUE_FULL) {
             ESP_LOGI(tag, "Cold side temp queue full");
         }
+
+        vTaskDelayUntil(&xLastWakeTime, ctrl_loop_period_ms / portTICK_PERIOD_MS);
     }
 }
 
@@ -99,13 +103,12 @@ void flowmeter_task(void *pvParameters)
         } else {
             flowRate = (float) 1 / (timeVal * 7.5);
         }
-        ret = xQueueSend(flowRateQueue, &flowRate, 100);
+        ret = xQueueSend(flowRateQueue, &flowRate, 100 / portTICK_PERIOD_MS);
         if (ret == errQUEUE_FULL) {
             ESP_LOGI(tag, "Flow rate queue full");
         }
-        vTaskDelayUntil(&xLastWakeTime, 250 / portTICK_PERIOD_MS);     // Run every second
+        vTaskDelayUntil(&xLastWakeTime, ctrl_loop_period_ms / portTICK_PERIOD_MS);     // Run every second
     }
-
 }
 
 static float filter_singlePoleIIR(float x, float y, float alpha)

@@ -13,7 +13,7 @@
 
 static char tag[] = "Controller";
 static bool element_status, flushSystem;
-static uint16_t ctrl_loop_period_ms;
+uint16_t ctrl_loop_period_ms;
 static int fanState = 0;
 
 #define SENSOR_MIN_OUTPUT 1600
@@ -132,7 +132,7 @@ void control_loop(void* params)
         coldTemp = get_cold_temp();
         hotTemp = get_hot_temp();
 
-        ESP_LOGI(tag, "T1: %.2f - T2: %.2f", hotTemp, coldTemp);
+        // ESP_LOGI(tag, "T1: %.2f - T2: %.2f", hotTemp, coldTemp);
         
         checkFan(hotTemp);
         deltaT = hotTemp - coldTemp;
@@ -160,7 +160,7 @@ void control_loop(void* params)
             output = SENSOR_MAX_OUTPUT;
         }
 
-        ESP_LOGI(tag, "P: %.2f - I: %.2f - D: %.2f", controllerSettings.P_gain * error, controllerSettings.I_gain * integral, controllerSettings.D_gain * derivative);        
+        // ESP_LOGI(tag, "P: %.2f - I: %.2f - D: %.2f", controllerSettings.P_gain * error, controllerSettings.I_gain * integral, controllerSettings.D_gain * derivative);        
 
         if (flushSystem) {
             output = 5000;
